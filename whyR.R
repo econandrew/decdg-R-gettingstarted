@@ -10,7 +10,7 @@ style <- style_atlas()
 
 # Import the data from API
 indicators <- c("SH.H2O.SAFE.ZS", "SH.H2O.SAFE.RU.ZS")
-df <- wbgdata(country = "countries_only", indicator = indicators, startdate = 2012, enddate = 2012, indicator.wide = FALSE)
+df <- wbgdata(country = "countries_only", indicator = indicators, startdate = 2012, enddate = 2012, indicator.wide = FALSE, cache = wbgcharts:::wb_newcache)
 
 # Transform the data - find the bottom 30 by rural
 bottom <- df %>%
@@ -23,14 +23,14 @@ bottom <- df %>%
 df_dotplot <- df %>%
   filter(complete.cases(.)) %>%
   filter(iso3c %in% bottom) %>%
-  mutate(iso3c = factor(iso3c, levels = bottom30))
+  mutate(iso3c = factor(iso3c, levels = bottom))
 
 # Simple plot
 ggplot(data = df_dotplot, aes(x = value, y = iso3c, color = indicatorID)) + geom_point()
 
 # Styled plot
 p <- ggplot(data = df_dotplot, aes(x = value, y = iso3c, color = indicatorID, shape = indicatorID)) +
-  geom_other_dotplot(aes(y = iso3c), size.line=0.25) +
+  geom_other_dotplot(aes(y = iso3c), size.line = 0.25) +
   geom_other_dotplot_label(
     aes(x = value, y = iso3c, label = wbgref$countries$labels[as.character(iso3c)]),
     side = "left", nudge_x = -1,
@@ -45,6 +45,8 @@ p <- ggplot(data = df_dotplot, aes(x = value, y = iso3c, color = indicatorID, sh
   theme(axis.text.y = element_blank(),
         legend.position = c(0.9,1), legend.justification = c(1,1),
         legend.direction = "horizontal", legend.margin = margin())
+
+p
 
 figure(
   p,
