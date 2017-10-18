@@ -8,7 +8,9 @@ output:
     theme: flatly
     toc: yes
 params:
-   tail: 20
+   year: 2015
+   tail: 30
+   style: atlas
 ---
 
 ```{r setup, include=FALSE}
@@ -31,11 +33,11 @@ library(wbgmaps)
 library(wbggeo)
 library(wbstats) # Getting 
 
-style <- style_atlas(9)
+style <- get(paste0("style_",params$style))(9)
 
 # Import the data from API
 indicators <- c("SH.H2O.SAFE.ZS", "SH.H2O.SAFE.RU.ZS")
-df <- wbgdata(country = "countries_only", indicator = indicators, startdate = 2012, enddate = 2012, indicator.wide = FALSE, cache = wbgcharts:::wb_newcache)
+df <- wbgdata(country = "countries_only", indicator = indicators, startdate = params$year, enddate = params$year, indicator.wide = FALSE, cache = wbgcharts:::wb_newcache)
 
 # Transform the data - find the bottom 30 by rural
 bottom <- df %>%
@@ -52,12 +54,14 @@ df_dotplot <- df %>%
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-head(df_dotplot)
+head(df_dotplot %>% arrange(iso3c, indicatorID))
 ```
 
 ## Plot one
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
+grid::grid.newpage()
+
 p <- ggplot(data = df_dotplot, aes(x = value, y = iso3c, color = indicatorID, shape = indicatorID)) +
   geom_other_dotplot(aes(y = iso3c), size.line = 0.25) +
   geom_other_dotplot_label(
@@ -79,7 +83,7 @@ figure(
   p,
   aspect_ratio = 3/4,
   title = "People in rural areas suffer from especially low access to water...",
-  subtitle = "Share of ppulation with access to an improved water source, national average and rural, 2012 (%)",
+  subtitle = paste0("Share of population with access to an improved water source, national average and rural (%), ", params$year),
   source = paste("Source:", wbg_source(indicators))
 )
 ```
@@ -87,6 +91,8 @@ figure(
 ## Plot two
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
+grid::grid.newpage()
+
 df_map <- df %>%
   filter(indicatorID == "SH.H2O.SAFE.ZS")
 
@@ -96,14 +102,14 @@ df_map$bin <- supercut(
     c("0-25", "25-50", "50-75", "75-100")
 )
 
-pg <- wbg_choropleth(df_map, wbgmaps[["low"]], style, "bin", aspect_ratio = 1)
+pg <- wbg_choropleth(df_map, wbgmaps[["low"]], style, "bin", aspect_ratio = 2)
 
 figure(
   pg,
   theme = style$theme(),
   aspect_ratio = 5/4,
   title = "Those who lack improved water sources are concentrated largely in Sub-Saharan Africa",
-  subtitle = wbg_name(indicators[1]),
+  subtitle = paste0(wbg_name(indicators[1]), ", ", params$year),
   source = paste("Source:", wbg_source(indicators[1]))
 )
 ```
