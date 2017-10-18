@@ -1,3 +1,5 @@
+# GENERAL SETUP ###############################################################
+
 # A script to replicate these two figures from the SDG atlas:
 # https://www.dropbox.com/s/4y91t3xchldfnc3/Screenshot%202017-10-18%2011.13.43.png?dl=0
 
@@ -11,6 +13,21 @@ library(wbggeo)
 
 style <- style_atlas()
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+# IMPORTING DATA ###############################################################
+
 # Import the data from API
 indicators <- c("SH.H2O.SAFE.ZS", "SH.H2O.SAFE.RU.ZS")
 df <- wbgdata(
@@ -23,6 +40,18 @@ df <- wbgdata(
 # Preview the data - but we can't edit b/c
 # REPRODUCIBILITY
 View(df)
+
+
+
+
+
+
+
+
+
+
+
+# TRANSFORMING DATA ############################################################
 
 # Instead we have to edit the data through code - find the bottom 30 by rural
 bottom <- df %>%
@@ -40,10 +69,38 @@ df_dotplot <- df %>%
 # Check the data again
 head(df_dotplot %>% arrange(iso3c, indicatorID))
 
+
+
+
+
+
+
+
+# VISUALIZATION ################################################################
+
 # Simple plot - then move legend, col, bar, then facetted bar, etc...
 # QUICK PROTOTYPING
 ggplot(data = df_dotplot, aes(x = value, y = iso3c, color = indicatorID)) +
   geom_point()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ADVANCED VISUALISATION #######################################################
 
 # Styled plot - FLEXIBILITY
 p <- ggplot(
@@ -71,9 +128,18 @@ grid::grid.newpage()
 figure(
   p,
   title = "People in rural areas suffer from especially low access to water...",
-  subtitle = "Share of ppulation with access to an improved water source, national average and rural, 2012 (%)",
+  subtitle = "Share of population with access to an improved water source, national average and rural, 2012 (%)",
   source = paste("Source:", wbg_source(indicators))
 )
+
+
+
+
+
+
+
+
+# A DIFFERENT VISUALIZATION ####################################################
 
 # Let's depict (some of) the same data on a map
 df_map <- df %>%
