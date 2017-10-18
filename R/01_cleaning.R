@@ -34,6 +34,7 @@ sum(is.na(merged$GAUL_CODE))
 # Number of admin regions per country -------------------------------------
 
 region_count <- merged %>%
+  filter(!is.na(GAUL_CODE)) %>%
   group_by(NAME_0) %>%
   summarise(
     n_regions = n()
